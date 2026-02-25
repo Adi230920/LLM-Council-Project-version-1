@@ -1,0 +1,456 @@
+/* ============================================================
+   BouleAI — Stylesheet
+   Stack: Vanilla CSS3, custom properties, no frameworks.
+   ============================================================ */
+
+/* ── Design Tokens ─────────────────────────────────────────── */
+:root {
+  --bg:           #0d0f14;
+  --surface:      #13161e;
+  --surface-2:    #1b1f2b;
+  --border:       #252a38;
+  --border-glow:  #3d5afe44;
+
+  --accent:       #3d5afe;
+  --accent-hover: #536dfe;
+  --accent-glow:  #3d5afe33;
+
+  --gold:         #ffc400;
+  --gold-subtle:  #ffc40018;
+
+  --success:      #00e5a0;
+  --danger:       #ff5252;
+  --muted:        #5c6580;
+
+  --text:         #e8eaf6;
+  --text-dim:     #9099b7;
+
+  --radius-sm:    6px;
+  --radius-md:    12px;
+  --radius-lg:    18px;
+
+  --font-mono:    'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+}
+
+/* ── Reset ──────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  font-size: 15px;
+  line-height: 1.65;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ── Header ─────────────────────────────────────────────────── */
+.site-header {
+  width: 100%;
+  padding: 2rem 2rem 1.5rem;
+  text-align: center;
+  border-bottom: 1px solid var(--border);
+  background: linear-gradient(180deg, #131720 0%, var(--bg) 100%);
+}
+
+.logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.9rem;
+  letter-spacing: -0.5px;
+}
+
+.logo-icon {
+  font-size: 1.6rem;
+  color: var(--gold);
+  filter: drop-shadow(0 0 8px var(--gold));
+}
+
+.logo-text { color: var(--text); }
+.logo-text strong { color: var(--accent); }
+
+.tagline {
+  margin-top: 0.3rem;
+  color: var(--text-dim);
+  font-size: 0.9rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* ── Main ───────────────────────────────────────────────────── */
+.main {
+  width: 100%;
+  max-width: 780px;
+  padding: 2.5rem 1.5rem 4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  flex: 1;
+}
+
+/* ── Panels ─────────────────────────────────────────────────── */
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  transition: border-color 0.2s;
+}
+
+.panel:focus-within {
+  border-color: var(--border-glow);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.panel-label {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-bottom: 0.75rem;
+}
+
+/* ── Textarea ───────────────────────────────────────────────── */
+.prompt-textarea {
+  width: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 1rem;
+  resize: vertical;
+  min-height: 120px;
+  line-height: 1.6;
+}
+
+.prompt-textarea::placeholder { color: var(--muted); }
+
+.textarea-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border);
+  gap: 1rem;
+}
+
+.char-count {
+  font-size: 0.78rem;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* ── Submit Button ──────────────────────────────────────────── */
+.submit-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-md);
+  padding: 0.65rem 1.4rem;
+  font-size: 0.92rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.18s, box-shadow 0.18s, transform 0.1s;
+  white-space: nowrap;
+}
+
+.submit-btn:hover:not(:disabled) {
+  background: var(--accent-hover);
+  box-shadow: 0 0 14px var(--accent-glow);
+}
+
+.submit-btn:active:not(:disabled) { transform: scale(0.97); }
+
+.submit-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* spinner only visible while loading */
+.btn-spinner {
+  display: none;
+  width: 15px;
+  height: 15px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+.submit-btn.loading .btn-spinner { display: inline-block; }
+.submit-btn.loading .btn-label   { opacity: 0.7; }
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── Status Bar ─────────────────────────────────────────────── */
+.status-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--radius-md);
+  padding: 0.85rem 1.25rem;
+  font-size: 0.92rem;
+  color: var(--text-dim);
+  animation: fadeIn 0.3s ease;
+}
+
+.pulse-dot {
+  width: 9px;
+  height: 9px;
+  background: var(--accent);
+  border-radius: 50%;
+  flex-shrink: 0;
+  animation: pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1;   transform: scale(1); }
+  50%       { opacity: 0.4; transform: scale(0.75); }
+}
+
+.elapsed {
+  margin-left: auto;
+  font-size: 0.78rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+  font-family: var(--font-mono);
+}
+
+/* ── Error Banner ───────────────────────────────────────────── */
+.error-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.7rem;
+  background: #1f1014;
+  border: 1px solid #5c1a24;
+  border-left: 3px solid var(--danger);
+  border-radius: var(--radius-md);
+  padding: 0.85rem 1.25rem;
+  font-size: 0.9rem;
+  color: #f48a94;
+  animation: fadeIn 0.3s ease;
+}
+
+.error-icon { flex-shrink: 0; }
+
+.error-close {
+  margin-left: auto;
+  background: none;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 0 0.2rem;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.error-close:hover { color: var(--text); }
+
+/* ── Results Section ────────────────────────────────────────── */
+.results-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  animation: fadeIn 0.4s ease;
+}
+
+/* ── Verdict Panel ──────────────────────────────────────────── */
+.verdict-panel {
+  border-color: var(--gold);
+  background: linear-gradient(135deg, var(--surface) 0%, #1a1710 100%);
+  box-shadow: 0 0 24px #ffc40012;
+}
+
+.verdict-label {
+  color: var(--gold);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.verdict-text {
+  color: var(--text);
+  line-height: 1.75;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* light markdown-like formatting for the verdict */
+.verdict-text h2 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--gold);
+  margin-top: 1.1rem;
+  margin-bottom: 0.3rem;
+  letter-spacing: 0.04em;
+}
+
+.verdict-text h2:first-child { margin-top: 0; }
+
+.verdict-text ul  { padding-left: 1.3rem; }
+.verdict-text li  { margin-bottom: 0.25rem; }
+
+/* ── Meta Bar ───────────────────────────────────────────────── */
+.meta-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.meta-chip {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 99px;
+  padding: 0.3rem 0.85rem;
+  font-size: 0.78rem;
+  color: var(--text-dim);
+}
+
+/* ── Council Details (collapsible) ──────────────────────────── */
+.council-details {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.council-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.5rem;
+  cursor: pointer;
+  list-style: none;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-dim);
+  user-select: none;
+  transition: color 0.15s;
+}
+
+.council-summary::-webkit-details-marker { display: none; }
+.council-summary:hover { color: var(--text); }
+
+.toggle-arrow {
+  font-size: 1.2rem;
+  transition: transform 0.25s;
+  display: inline-block;
+}
+
+.council-details[open] .toggle-arrow { transform: rotate(90deg); }
+
+.council-members-list {
+  padding: 0 1.25rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+/* Individual member card */
+.member-card {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.member-header {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.65rem 1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.member-status {
+  font-size: 0.85rem;
+  flex-shrink: 0;
+}
+
+.member-name {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text);
+  font-family: var(--font-mono);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.member-badge {
+  margin-left: auto;
+  font-size: 0.7rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 99px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.member-badge.ok      { background: #00332a; color: var(--success); }
+.member-badge.failed  { background: #2a0a0a; color: var(--danger); }
+
+.member-body {
+  padding: 0.85rem 1rem;
+  font-size: 0.88rem;
+  color: var(--text-dim);
+  white-space: pre-wrap;
+  word-break: break-word;
+  line-height: 1.6;
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+/* ── Footer ─────────────────────────────────────────────────── */
+.site-footer {
+  width: 100%;
+  padding: 1.25rem;
+  text-align: center;
+  font-size: 0.78rem;
+  color: var(--muted);
+  border-top: 1px solid var(--border);
+}
+
+.site-footer a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.site-footer a:hover { text-decoration: underline; }
+
+/* ── Utilities ──────────────────────────────────────────────── */
+[hidden] { display: none !important; }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Scrollbar ──────────────────────────────────────────────── */
+::-webkit-scrollbar       { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+/* ── Responsive ─────────────────────────────────────────────── */
+@media (max-width: 520px) {
+  .textarea-footer { flex-direction: column; align-items: stretch; }
+  .submit-btn      { justify-content: center; }
+}

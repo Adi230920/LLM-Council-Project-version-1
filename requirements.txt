@@ -1,0 +1,17 @@
+# BouleAI — Python Dependencies
+# Install with: pip install -r requirements.txt
+
+# Web framework
+fastapi>=0.111.0
+
+# Pydantic (data validation)
+pydantic>=2.7.0
+
+# ASGI server
+uvicorn[standard]>=0.29.0
+
+# Async HTTP client (Rule 1: no synchronous requests library)
+aiohttp>=3.9.0
+
+# .env file loading
+python-dotenv>=1.0.0
