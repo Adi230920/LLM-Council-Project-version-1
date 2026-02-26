@@ -2,91 +2,21 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description"
-    content="BouleAI — Multi-model LLM Advisory Council. Ask a question, receive a synthesized consensus from 4 AI models adjudicated by a Chairman." />
-  <title>BouleAI — Advisory Council</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BouleAI — LLM Advisory Council</title>
 </head>
 
 <body>
-
-  <header class="site-header">
-    <div class="logo">
-      <span class="logo-icon" aria-hidden="true">⚖</span>
-      <span class="logo-text">Boule<strong>AI</strong></span>
-    </div>
-    <p class="tagline">Four minds. One verdict.</p>
-  </header>
-
-  <main class="main">
-
-    <!-- ── Query Panel ─────────────────────────────────────── -->
-    <section class="panel query-panel" aria-label="Submit your question">
-      <label for="prompt-input" class="panel-label">Your Question</label>
-      <textarea id="prompt-input" class="prompt-textarea" rows="5" maxlength="4096"
-        placeholder="Ask the council anything…&#10;e.g. What are the trade-offs between REST and GraphQL?"
-        aria-describedby="char-count"></textarea>
-      <div class="textarea-footer">
-        <span id="char-count" class="char-count" aria-live="polite">0 / 4096</span>
-        <button id="submit-btn" class="submit-btn" type="button">
-          <span class="btn-label">Consult the Council</span>
-          <span class="btn-spinner" aria-hidden="true"></span>
-        </button>
-      </div>
-    </section>
-
-    <!-- ── Status / Loading ────────────────────────────────── -->
-    <div id="status-bar" class="status-bar" role="status" aria-live="polite" hidden>
-      <span class="pulse-dot" aria-hidden="true"></span>
-      <span id="status-text">The Council is deliberating…</span>
-      <span id="elapsed-timer" class="elapsed">0s</span>
-    </div>
-
-    <!-- ── Error Banner ────────────────────────────────────── -->
-    <div id="error-banner" class="error-banner" role="alert" hidden>
-      <span class="error-icon" aria-hidden="true">⚠</span>
-      <span id="error-text"></span>
-      <button class="error-close" id="error-close-btn" aria-label="Dismiss error">✕</button>
-    </div>
-
-    <!-- ── Results ─────────────────────────────────────────── -->
-    <section id="results-section" class="results-section" hidden aria-label="Council results">
-
-      <!-- Chairman Verdict -->
-      <div class="panel verdict-panel">
-        <h2 class="panel-label verdict-label">
-          <span aria-hidden="true">🎓</span> Chairman's Verdict
-        </h2>
-        <div id="verdict-text" class="verdict-text"></div>
-      </div>
-
-      <!-- Meta stats -->
-      <div class="meta-bar" id="meta-bar">
-        <span id="meta-participation" class="meta-chip"></span>
-        <span id="meta-timing" class="meta-chip"></span>
-      </div>
-
-      <!-- Toggle for council details -->
-      <details class="council-details" id="council-details">
-        <summary class="council-summary">
-          <span>Show individual Council responses</span>
-          <span class="toggle-arrow" aria-hidden="true">›</span>
-        </summary>
-        <div id="council-members-list" class="council-members-list"></div>
-      </details>
-
-    </section>
-
-  </main>
-
-  <footer class="site-footer">
-    Powered by <a href="https://openrouter.ai" target="_blank" rel="noopener">OpenRouter</a> free-tier models · Built
-    with <span aria-hidden="true">♥</span> — no frameworks
-  </footer>
-
-  <script src="app.js"></script>
+  <script type="module">
+    import Auth from './js/auth.js';
+    if (Auth.isAuthenticated()) {
+      window.location.href = '/dashboard.html';
+    } else {
+      window.location.href = '/login.html';
+    }
+  </script>
+  <p>Redirecting to dashboard...</p>
 </body>
 
 </html>

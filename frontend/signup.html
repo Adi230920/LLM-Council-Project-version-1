@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Account | BouleAI</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+
+<body class="auth-page">
+    <div class="auth-container">
+        <div class="auth-card">
+            <h1>Get <span>Started</span></h1>
+            <p style="text-align: center; color: var(--text-dim); margin-bottom: 2rem;">Join the elite LLM Advisory
+                Council</p>
+
+            <form id="signup-form">
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" name="email" placeholder="name@company.com" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Choose Password</label>
+                    <input type="password" id="password" name="password" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="auth-btn" id="signup-btn">Create Account</button>
+            </form>
+
+            <div class="auth-footer">
+                Already have an account? <a href="login.html">Sign in</a>
+            </div>
+
+            <div id="error-message"
+                style="color: var(--danger); text-align: center; margin-top: 1rem; font-size: 0.9rem; display: none;">
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .auth-card h1 span {
+            color: var(--primary);
+        }
+
+        .auth-page {
+            overflow: auto;
+        }
+    </style>
+
+    <script type="module">
+        import Auth from './js/auth.js';
+
+        const form = document.getElementById('signup-form');
+        const errorEl = document.getElementById('error-message');
+
+        form.onsubmit = async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('signup-btn');
+            btn.disabled = true;
+            btn.textContent = 'Creating account...';
+            errorEl.style.display = 'none';
+
+            try {
+                const formData = new FormData(form);
+                await Auth.signup(formData.get('email'), formData.get('password'));
+            } catch (err) {
+                errorEl.textContent = err.message || 'Signup failed';
+                errorEl.style.display = 'block';
+                btn.disabled = false;
+                btn.textContent = 'Join the Council';
+            }
+        };
+    </script>
+</body>
+
+</html>

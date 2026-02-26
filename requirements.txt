@@ -15,3 +15,14 @@ aiohttp>=3.9.0
 
 # .env file loading
 python-dotenv>=1.0.0
+
+# Database (Async SQLite)
+sqlalchemy>=2.0.0
+aiosqlite>=0.20.0
+
+# Auth & Security
+passlib[bcrypt]>=1.7.4
+python-jose[cryptography]>=3.3.0
+python-multipart>=0.0.9
+asyncpg>=0.29.0
+email-validator>=2.1.0

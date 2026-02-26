@@ -1,17 +1,10 @@
-"""
-BouleAI — FastAPI Application Entry Point
-
-Initializes the FastAPI app, mounts static files for the vanilla frontend,
-and registers API routers. All heavy lifting (model calls) is delegated
-to the services layer which is fully asynchronous.
-"""
-
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 import logging
 import os
+from database import init_db
 
 # ---------------------------------------------------------------------------
 # Logging
@@ -25,12 +18,14 @@ logger = logging.getLogger("boule_ai")
 
 
 # ---------------------------------------------------------------------------
-# Lifespan (replaces deprecated @app.on_event)
+# Lifespan
 # ---------------------------------------------------------------------------
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Manage startup and shutdown tasks."""
     logger.info("🚀 BouleAI starting up…")
+    await init_db()
+    logger.info("📦 Database initialized.")
     yield
     logger.info("🛑 BouleAI shutting down…")
 
@@ -41,51 +36,46 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title="BouleAI — LLM Advisory Council",
     description=(
-        "Queries 4 Council LLMs concurrently via OpenRouter (free tier), "
-        "aggregates their answers, and passes the result to a Chairman model "
-        "for a final synthesized verdict."
+        "ChatGPT-style interface for the high-fidelity 3-stage LLM Council."
     ),
-    version="0.1.0",
+    version="0.2.0",
     lifespan=lifespan,
 )
 
 # ---------------------------------------------------------------------------
-# CORS — allow the vanilla-JS frontend served on the same origin (or locally)
+# CORS
 # ---------------------------------------------------------------------------
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],   # tighten in production
+    allow_origins=os.getenv("ALLOWED_ORIGINS", "*").split(","),
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 # ---------------------------------------------------------------------------
-# API routers — registered BEFORE the static catch-all mount so /api/v1/*
-# routes are matched first and not shadowed by the frontend's '/' mount.
+# API routers
 # ---------------------------------------------------------------------------
-from routers.api import router as api_router   # noqa: E402
+from routers.api import router as api_router
+from routers.auth import router as auth_router
+from routers.chat import router as chat_router
+
 app.include_router(api_router)
+app.include_router(auth_router)
+app.include_router(chat_router)
 
 
 # ---------------------------------------------------------------------------
-# Static files — vanilla HTML/CSS/JS frontend
-# IMPORTANT: must be mounted LAST — StaticFiles with html=True acts as a
-# catch-all and would swallow API routes if registered first.
+# Static files
 # ---------------------------------------------------------------------------
 FRONTEND_DIR = os.path.join(os.path.dirname(__file__), "frontend")
 if os.path.isdir(FRONTEND_DIR):
     app.mount("/", StaticFiles(directory=FRONTEND_DIR, html=True), name="frontend")
     logger.info("✅ Frontend static files mounted from: %s", FRONTEND_DIR)
-else:
-    logger.warning(
-        "⚠️  'frontend/' directory not found — skipping static file mount. "
-        "Create it and add index.html to enable the UI."
-    )
 
 
 # ---------------------------------------------------------------------------
-# Health-check — always useful
+# Health-check
 # ---------------------------------------------------------------------------
 @app.get("/health", tags=["Meta"])
 async def health_check():
