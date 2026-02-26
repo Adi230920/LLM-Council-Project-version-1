@@ -8,14 +8,27 @@ from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sess
 
 import os
 
-# Use environment variable for database URL, default to local SQLite for development
-DATABASE_URL = os.getenv("DATABASE_URL", "sqlite+aiosqlite:///./boule_ai.db")
+# 1. If DATABASE_URL exists -> use it.
+# 2. Otherwise default to Render persistent disk path (maintaining async compatibility)
+DATABASE_URL = os.getenv("DATABASE_URL", "sqlite+aiosqlite:////var/data/boule_ai.db")
 
-# If using PostgreSQL, ensure the driver is async (replace postgres:// with postgresql+asyncpg://)
+# 4. Maintain async SQLAlchemy compatibility for PostgreSQL
 if DATABASE_URL.startswith("postgres://"):
     DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql+asyncpg://", 1)
 elif DATABASE_URL.startswith("postgresql://"):
     DATABASE_URL = DATABASE_URL.replace("postgresql://", "postgresql+asyncpg://", 1)
+
+# 3. Ensure directory exists before DB init: Create /var/data if missing.
+if DATABASE_URL.startswith("sqlite") and "/var/data" in DATABASE_URL:
+    # 5. Do NOT break local development.
+    if os.name == 'nt' and not os.getenv("DATABASE_URL"):
+        DATABASE_URL = "sqlite+aiosqlite:///./boule_ai.db"
+    else:
+        try:
+            os.makedirs("/var/data", exist_ok=True)
+        except OSError:
+            if not os.getenv("DATABASE_URL"):
+                DATABASE_URL = "sqlite+aiosqlite:///./boule_ai.db"
 
 Base = declarative_base()
 
