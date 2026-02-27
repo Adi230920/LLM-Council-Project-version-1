@@ -77,13 +77,21 @@ app.add_middleware(
 # ---------------------------------------------------------------------------
 @app.middleware("http")
 async def add_security_headers(request: Request, call_next):
+    # ✅ Let CORSMiddleware handle OPTIONS preflight directly.
+    # If we process OPTIONS here first, CORS never gets to respond with 200.
+    if request.method == "OPTIONS":
+        response: Response = await call_next(request)
+        return response
+
     response: Response = await call_next(request)
     response.headers["X-Content-Type-Options"] = "nosniff"
     response.headers["X-Frame-Options"] = "DENY"
     response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    # ✅ connect-src must include the Render backend so the Vercel frontend
+    #    can fetch it without the browser blocking it via CSP.
     response.headers["Content-Security-Policy"] = (
         "default-src 'self'; "
-        "connect-src 'self'; "
+        "connect-src 'self' https://bouleai.onrender.com; "
         "script-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; "
         "style-src 'self' 'unsafe-inline'; "
         "img-src 'self' data:"
