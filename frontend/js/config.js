@@ -15,4 +15,4 @@
  * same origin (uvicorn main:app --port 8000).
  * ──────────────────────────────────────────────────────────────────────────────
  */
-window.BOULE_BACKEND_URL = ""; // ← paste your Render URL here, e.g. "https://bouleai.onrender.com"
+window.BOULE_BACKEND_URL = "https://bouleai.onrender.com"; // ← paste your Render URL here, e.g. "https://bouleai.onrender.com"
