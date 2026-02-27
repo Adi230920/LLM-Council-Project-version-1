@@ -14,11 +14,11 @@ logger = logging.getLogger("boule_ai.groq")
 GROQ_API_BASE: str = "https://api.groq.com/openai/v1/chat/completions"
 
 # Timeout settings
-CONNECT_TIMEOUT: float = 10.0
-READ_TIMEOUT: float = 60.0
+CONNECT_TIMEOUT: float = 8.0
+READ_TIMEOUT: float = 25.0
 
 # Retry settings
-MAX_RETRIES: int = 3
+MAX_RETRIES: int = 1
 BACKOFF_BASE: float = 2.0
 BACKOFF_JITTER: float = 1.0
 

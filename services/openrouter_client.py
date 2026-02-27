@@ -31,13 +31,13 @@ logger = logging.getLogger("boule_ai.openrouter")
 OPENROUTER_API_BASE: str = "https://openrouter.ai/api/v1/chat/completions"
 
 # Timeout settings (seconds) — kept tight because free-tier drops connections.
-CONNECT_TIMEOUT: float = 10.0
-READ_TIMEOUT: float = 60.0
+CONNECT_TIMEOUT: float = 8.0
+READ_TIMEOUT: float = 25.0
 
 # Retry settings
-MAX_RETRIES: int = 3
-BACKOFF_BASE: float = 2.0   # seconds — doubles each attempt: 2 → 4 → 8
-BACKOFF_JITTER: float = 1.0  # ±1 s of random jitter to spread thundering herd
+MAX_RETRIES: int = 1
+BACKOFF_BASE: float = 2.0   # seconds
+BACKOFF_JITTER: float = 1.0  # ±1 s of random jitter
 
 # Fallback string returned when all retries are exhausted (Rule 3).
 FALLBACK_RESPONSE_TEMPLATE: str = "[{model} failed to respond after {retries} retries]"

@@ -13,7 +13,7 @@ DEFAULT_COUNCIL_MODELS = [
     ModelConfig(provider="openrouter", model="arcee-ai/trinity-large-preview:free"),
     ModelConfig(provider="openrouter", model="z-ai/glm-4.5-air:free"),
     ModelConfig(provider="openrouter", model="arcee-ai/trinity-mini:free"),
-    ModelConfig(provider="groq", model="moonshotai/kimi-k2-instruct-0905")
+    ModelConfig(provider="openrouter", model="openrouter/free")
 ]
 
 DEFAULT_CHAIRMAN_MODEL = ModelConfig(provider="openrouter", model="arcee-ai/trinity-large-preview:free")

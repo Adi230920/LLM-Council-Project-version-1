@@ -1,43 +1,34 @@
+// js/api.js
 /**
- * BouleAI — API Wrapper
+ * Handles communication with the FastAPI backend.
  */
 
-const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-    ? ''
-    : 'https://your-backend-url.railway.app'; // Replace with actual backend URL after deployment
+// Always use a relative path — frontend is served from the same FastAPI origin.
+const API_BASE = '/api/v1';
 
-const API = {
-    async fetch(endpoint, options = {}) {
-        const fullURL = endpoint.startsWith('http') ? endpoint : `${API_URL}${endpoint}`;
-        const token = localStorage.getItem('access_token');
-        const headers = {
-            'Content-Type': 'application/json',
-            ...options.headers
-        };
-
-        if (token) {
-            headers['Authorization'] = `Bearer ${token}`;
-        }
-
-        const response = await fetch(fullURL, {
-            ...options,
-            headers
+export async function consultCouncil(promptText) {
+    try {
+        const response = await fetch(`${API_BASE}/consult`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                prompt: promptText,
+                temperature: 0.7,
+                max_tokens: 512
+            })
         });
 
-        if (response.status === 401 && !endpoint.includes('/auth/')) {
-            // Token expired or invalid
-            localStorage.removeItem('access_token');
-            window.location.href = '/login.html';
-            return;
-        }
-
         if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.detail || 'API request failed');
+            const err = await response.json();
+            throw new Error(err.detail || `Server Error: ${response.status}`);
         }
 
-        return response.json();
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error("consultCouncil Error:", error);
+        throw error;
     }
-};
-
-export default API;
+}

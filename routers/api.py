@@ -3,13 +3,16 @@ from __future__ import annotations
 import logging
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
+from slowapi import Limiter
+from slowapi.util import get_remote_address
 
 from models.schemas import ConsultRequest, DeliberationTrace
 from services.orchestrator import run_deliberation
 from services.provider_manager import ProviderManager
 
 logger = logging.getLogger("boule_ai.api")
+limiter = Limiter(key_func=get_remote_address)
 
 router = APIRouter(prefix="/api/v1", tags=["Council"])
 
@@ -35,7 +38,9 @@ async def get_manager() -> ProviderManager:
         "1. Independent Opinions, 2. Anonymous Peer Review, 3. Chairman Synthesis."
     ),
 )
+@limiter.limit("5/minute")
 async def consult(
+    request: Request,
     body: ConsultRequest,
     manager: Annotated[ProviderManager, Depends(get_manager)],
 ) -> DeliberationTrace:
@@ -51,7 +56,7 @@ async def consult(
         logger.exception("Council deliberation failed unexpectedly: %s", exc)
         raise HTTPException(
             status_code=502,
-            detail=f"Council deliberation failed: {exc}",
+            detail="Council deliberation failed. Please try again later.",
         ) from exc
 
 @router.get("/config", summary="Get default model configuration")

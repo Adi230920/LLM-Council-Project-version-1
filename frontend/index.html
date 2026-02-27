@@ -1,22 +1,85 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BouleAI — LLM Advisory Council</title>
+  <title>BouleAI — LLM Council</title>
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  <!-- Lightweight DOMPurify & Marked for safe Markdown parsing, loaded from CDN for zero setup overhead -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.3/purify.min.js"></script>
 </head>
-
 <body>
-  <script type="module">
-    import Auth from './js/auth.js';
-    if (Auth.isAuthenticated()) {
-      window.location.href = '/dashboard.html';
-    } else {
-      window.location.href = '/login.html';
-    }
-  </script>
-  <p>Redirecting to dashboard...</p>
-</body>
 
+  <!-- Onboarding Modal -->
+  <div id="onboardingModal" class="modal-overlay">
+    <div class="modal-content">
+      <h2>Welcome to the AI Council</h2>
+      <p>
+        Experience a rigorous, 3-stage deliberation process. Instead of a single AI, 
+        your queries are evaluated by a whole council:
+      </p>
+      <ul>
+        <li><strong>Stage 1:</strong> Multiple AI models form independent opinions.</li>
+        <li><strong>Stage 2:</strong> They rigorously cross-review and critique each other's reasoning.</li>
+        <li><strong>Stage 3:</strong> A Chairman synthesizes the reviews into a high-confidence final verdict.</li>
+      </ul>
+      <p>Discover complete transparency via the Trace form under each answer.</p>
+      <div class="modal-actions">
+        <button id="startExploreBtn" class="btn primary">Start Exploring</button>
+        <a href="https://github.com/Adi230920/LLM-Council-Project" target="_blank" class="btn secondary">View on GitHub</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main App Layout -->
+  <div class="app-container">
+    
+    <!-- Top Header -->
+    <header class="app-header">
+      <div class="logo">
+        <h1>Boule<span>AI</span></h1>
+      </div>
+      <div class="header-actions">
+        <button id="themeToggle" class="icon-btn" aria-label="Toggle Theme">
+          <!-- Default Moon Icon for Dark mode -->
+          <svg id="themeIcon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+          </svg>
+        </button>
+        <a href="https://github.com/Adi230920/LLM-Council-Project" target="_blank" class="btn secondary sm-hide">GitHub</a>
+      </div>
+    </header>
+
+    <!-- Scrollable Chat History -->
+    <main class="chat-history" id="chatHistory">
+      <!-- Empty state / Initial welcome -->
+      <div class="welcome-banner" id="welcomeBanner">
+        <h2>What would you like the Council to deliberate on?</h2>
+        <p>Try asking a complex, multi-faceted question requiring deep reasoning.</p>
+      </div>
+      <!-- Dynamically injected messages will go here -->
+    </main>
+
+    <!-- Sticky Input Area -->
+    <footer class="chat-input-area">
+      <div class="input-wrapper">
+        <textarea id="promptInput" rows="1" placeholder="Consult the Council..." aria-label="Consult the Council"></textarea>
+        <button id="sendBtn" class="send-btn" aria-label="Send">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+          </svg>
+        </button>
+      </div>
+      <div class="input-footer">
+        Powered by BouleAI high-fidelity 3-stage validation
+      </div>
+    </footer>
+    
+  </div>
+
+  <script type="module" src="js/app.js"></script>
+</body>
 </html>

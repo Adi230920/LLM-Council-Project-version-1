@@ -39,8 +39,8 @@ class DeliberationTrace(BaseModel):
     meta: Dict[str, Any]
 
 class ConsultRequest(BaseModel):
-    prompt: str = Field(..., min_length=3, max_length=4096)
-    council_models: Optional[List[ModelConfig]] = None
+    prompt: str = Field(..., min_length=3, max_length=800)  # Public demo: 800 char cap
+    council_models: Optional[List[ModelConfig]] = Field(None, max_length=4)  # Max 4 models
     chairman_model: Optional[ModelConfig] = None
-    temperature: float = 0.7
-    max_tokens: int = 1024
+    temperature: float = Field(0.7, ge=0.0, le=1.0)
+    max_tokens: int = Field(512, ge=64, le=512)  # Hard cap: 512 tokens per model
