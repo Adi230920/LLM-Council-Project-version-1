@@ -2,7 +2,7 @@ import asyncio
 import logging
 import json
 import re
-from typing import List, Dict, Any
+from typing import List
 from models.schemas import Stage1Opinion, Stage2Review, RankingItem, DetailedScore, ModelConfig
 from services.provider_manager import ProviderManager
 from utils.anonymizer import anonymize_opinions
@@ -55,7 +55,7 @@ async def conduct_reviews(
             config=config,
             messages=messages,
             temperature=temperature,
-            max_tokens=2048
+            max_tokens=1024  # ✅ Reduced from 2048 — reviews are structured JSON, 1024 is sufficient
         )
         for config in reviewer_configs
     ]
@@ -76,8 +76,8 @@ async def conduct_reviews(
             continue
             
         try:
-            # Clean possible markdown formatting
-            clean_json = re.sub(r'^```json\s*|\s*```$', '', result.strip(), flags=re.MULTILINE)
+            # Strip possible markdown code fence wrapping
+            clean_json = re.sub(r'^```(?:json)?\s*|\s*```$', '', result.strip(), flags=re.MULTILINE)
             data = json.loads(clean_json)
             
             reviews.append(Stage2Review(

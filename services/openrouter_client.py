@@ -19,9 +19,6 @@ import random
 from typing import Any
 
 import aiohttp
-from dotenv import load_dotenv
-
-load_dotenv()
 
 logger = logging.getLogger("boule_ai.openrouter")
 

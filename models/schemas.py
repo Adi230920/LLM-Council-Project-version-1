@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import List, Dict, Any, Optional
+from typing import Annotated, List, Dict, Any, Optional
 
 class ModelConfig(BaseModel):
     provider: str  # "openrouter" or "groq"
@@ -40,7 +40,9 @@ class DeliberationTrace(BaseModel):
 
 class ConsultRequest(BaseModel):
     prompt: str = Field(..., min_length=3, max_length=800)  # Public demo: 800 char cap
-    council_models: Optional[List[ModelConfig]] = Field(None, max_length=4)  # Max 4 models
+    # ✅ Pydantic v2: use Annotated with a max_length constraint on the List
+    # Previously Field(None, max_length=4) was silently ignored for list types.
+    council_models: Optional[Annotated[List[ModelConfig], Field(max_length=4)]] = None
     chairman_model: Optional[ModelConfig] = None
     temperature: float = Field(0.7, ge=0.0, le=1.0)
     max_tokens: int = Field(512, ge=64, le=512)  # Hard cap: 512 tokens per model

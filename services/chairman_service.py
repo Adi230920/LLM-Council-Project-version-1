@@ -39,17 +39,26 @@ async def synthesize_deliberation(
     Stage 3: Chairman Meta-Synthesis.
     Reconciles opinions and reviews into a final verdict.
     """
-    logger.info("Executing Stage 3: Synthesizing deliberation with model %s (%s)", chairman_config.model, chairman_config.provider)
+    logger.info(
+        "Executing Stage 3: Synthesizing deliberation with model %s (%s)",
+        chairman_config.model,
+        chairman_config.provider,
+    )
     
     formatted_opinions = "\n".join([
         f"--- RESPONSE #{op.response_id} ---\n{op.response}\n"
         for op in opinions if op.succeeded
     ])
     
+    if not formatted_opinions:
+        logger.warning("No successful opinions to synthesize — returning fallback verdict.")
+        return "[Chairman could not synthesize: no council opinions succeeded.]"
+    
     formatted_reviews = []
     for rev in reviews:
-        if not rev.succeeded: continue
-        rev_text = f"Reviewer Model (Anonymized):\n"
+        if not rev.succeeded:
+            continue
+        rev_text = "Reviewer Model (Anonymized):\n"
         for score in rev.detailed_scores:
             rev_text += (
                 f"- Assessment of Response #{score.response_id}:\n"
@@ -58,10 +67,12 @@ async def synthesize_deliberation(
             )
         formatted_reviews.append(rev_text)
     
+    reviews_section = "\n---\n".join(formatted_reviews) if formatted_reviews else "(No peer reviews succeeded.)"
+    
     chairman_payload = (
         f"ORIGINAL QUERY: {prompt}\n\n"
         f"COUNCIL OPINIONS:\n{formatted_opinions}\n\n"
-        f"PEER REVIEWS:\n" + "\n---\n".join(formatted_reviews)
+        f"PEER REVIEWS:\n{reviews_section}"
     )
     
     messages = [
@@ -74,7 +85,7 @@ async def synthesize_deliberation(
             config=chairman_config,
             messages=messages,
             temperature=temperature,
-            max_tokens=2048
+            max_tokens=1024  # ✅ Reduced from 2048 — synthesis should be concise and decisive
         )
         return verdict
     except Exception as e:

@@ -17,7 +17,7 @@ limiter = Limiter(key_func=get_remote_address)
 router = APIRouter(prefix="/api/v1", tags=["Council"])
 
 # ---------------------------------------------------------------------------
-# Dependency — shared ProviderManager per request
+# Dependency — shared ProviderManager per request (manages aiohttp sessions)
 # ---------------------------------------------------------------------------
 async def get_manager() -> ProviderManager:
     manager = ProviderManager()
@@ -27,7 +27,7 @@ async def get_manager() -> ProviderManager:
         await manager.close()
 
 # ---------------------------------------------------------------------------
-# Endpoint
+# POST /api/v1/consult — Full 3-stage deliberation
 # ---------------------------------------------------------------------------
 @router.post(
     "/consult",
@@ -59,11 +59,15 @@ async def consult(
             detail="Council deliberation failed. Please try again later.",
         ) from exc
 
+# ---------------------------------------------------------------------------
+# GET /api/v1/config — Returns default model configuration
+# ---------------------------------------------------------------------------
 @router.get("/config", summary="Get default model configuration")
 async def get_config():
     """Returns the default council and chairman models used by the backend."""
     from services.orchestrator import DEFAULT_COUNCIL_MODELS, DEFAULT_CHAIRMAN_MODEL
     return {
-        "default_council_models": [m.dict() for m in DEFAULT_COUNCIL_MODELS],
-        "default_chairman_model": DEFAULT_CHAIRMAN_MODEL.dict(),
+        # ✅ Use .model_dump() — Pydantic v2 replaces deprecated .dict()
+        "default_council_models": [m.model_dump() for m in DEFAULT_COUNCIL_MODELS],
+        "default_chairman_model": DEFAULT_CHAIRMAN_MODEL.model_dump(),
     }
