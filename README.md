@@ -6,9 +6,8 @@
 
 [![Python](https://img.shields.io/badge/Python-3.12-3776AB?style=flat-square&logo=python&logoColor=white)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.111-009688?style=flat-square&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
-[![OpenRouter](https://img.shields.io/badge/OpenRouter-Free%20Tier-FF6B35?style=flat-square)](https://openrouter.ai/)
-[![Groq](https://img.shields.io/badge/Groq-Ultra--Fast%20LLM-F55036?style=flat-square)](https://groq.com/)
-[![Vercel](https://img.shields.io/badge/Vercel-Ready-000000?style=flat-square&logo=vercel&logoColor=white)](https://vercel.com/)
+[![Render](https://img.shields.io/badge/Backend-Render%20Free-46E3B7?style=flat-square)](https://render.com/)
+[![Vercel](https://img.shields.io/badge/Frontend-Vercel%20Free-000000?style=flat-square&logo=vercel&logoColor=white)](https://vercel.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](LICENSE)
 
 </div>
@@ -19,21 +18,45 @@
 
 Most AI chatbots give you **one opinion from one model**. BouleAI is different.
 
-Inspired by ancient Athenian democratic councils (*Boule* — βουλή), BouleAI routes every query through a **rigorous 3-stage deliberation pipeline** powered by multiple independent LLM models. Instead of trusting a single AI's answer, you get a synthesized consensus — the product of independent reasoning, anonymous peer critique, and a final chairman synthesis.
+Inspired by ancient Athenian democratic councils (*Boule* — βουλή), BouleAI routes every query through a **rigorous 3-stage deliberation pipeline** powered by multiple independent LLM models. Instead of trusting a single AI's answer, you get a synthesized consensus — the product of independent reasoning, anonymous peer critique, and chairman synthesis.
 
-Think of it as a **peer-reviewed answer**, produced in real time.
+---
+
+## ☁️ Deployment Architecture (100% Free)
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                         USER'S BROWSER                              │
+└──────────────────┬──────────────────────┬───────────────────────────┘
+                   │  Page Load           │  API Call (fetch)
+                   ▼                      ▼
+┌──────────────────────────┐   ┌──────────────────────────────────────┐
+│   VERCEL FREE (CDN)      │   │   RENDER FREE (Web Service)          │
+│   frontend/index.html    │──▶│   FastAPI — main.py                  │
+│   frontend/css/*.css     │   │   POST /api/v1/consult               │
+│   frontend/js/*.js       │   │   No timeout limit                   │
+│                          │   │   OpenRouter + Groq LLM calls        │
+│  (served globally from   │   │  (runs uvicorn, stays alive)         │
+│   Vercel Edge CDN)       │   │                                      │
+└──────────────────────────┘   └──────────────────────────────────────┘
+        FREE                              FREE
+   Next-day deploy                  ~50s cold start on
+   Instant CDN                      first req after idle
+```
+
+**Why this split?** Vercel Free has a 10-second function timeout — far too short for the 3-stage LLM pipeline (30–90 s). Render Free has **no timeout** on web services. Vercel Free is ideal for the static frontend. Zero cost, no compromises.
 
 ---
 
 ## ✨ Features
 
 - **3-Stage Deliberation Pipeline** — Opinions → Peer Review → Chairman Synthesis
-- **Multi-Provider Support** — Routes requests to both OpenRouter and Groq simultaneously
-- **Fully Async** — Zero blocking calls; built on `aiohttp` and FastAPI's ASGI runtime
-- **Graceful Degradation** — If any model fails, the pipeline continues with the remaining results
-- **Production-Hardened** — Rate limiting (5 req/min/IP), CSP headers, anonymized peer reviews
+- **Multi-Provider Support** — OpenRouter (free models) + Groq (fast inference)
+- **Fully Async** — Zero blocking calls; built on `aiohttp` + FastAPI ASGI
+- **Graceful Degradation** — Pipeline continues if individual models fail
+- **Rate Limited** — 5 req/min/IP on `/consult`, 20/min global
 - **Zero Frontend Dependencies** — Pure HTML5 / CSS3 / ES6 (no build step, no npm)
-- **Vercel-Ready** — Serverless-compatible Python entrypoint with correct routing configuration
+- **100% Free Hosting** — Render Free backend + Vercel Free frontend
 
 ---
 
@@ -42,12 +65,12 @@ Think of it as a **peer-reviewed answer**, produced in real time.
 | Layer | Technology |
 |---|---|
 | **Backend** | FastAPI 0.111+ (Python 3.12, ASGI) |
-| **LLM Providers** | OpenRouter (free-tier models) + Groq (ultra-fast inference) |
+| **LLM Providers** | OpenRouter (free-tier models) + Groq (ultra-fast) |
 | **HTTP Client** | `aiohttp` (fully async, connection-pooled) |
-| **Rate Limiting** | `slowapi` (in-memory, per-IP, no Redis required) |
-| **Frontend** | Vanilla HTML5 + CSS3 + ES6 JavaScript |
-| **Deployment** | Vercel (serverless Python runtime) |
-| **Environment** | `python-dotenv` for local secrets management |
+| **Rate Limiting** | `slowapi` (in-memory, per-IP) |
+| **Frontend** | Vanilla HTML5 + CSS3 + ES6 JS |
+| **Backend Hosting** | [Render](https://render.com) Free Web Service |
+| **Frontend Hosting** | [Vercel](https://vercel.com) Free Static CDN |
 
 ---
 
@@ -56,252 +79,153 @@ Think of it as a **peer-reviewed answer**, produced in real time.
 ```
 LLM-Council-Project-version-1/
 │
-├── api/
-│   └── index.py              # ← Vercel serverless entrypoint (re-exports FastAPI app)
-│
-├── frontend/                 # ← Static files served directly by Vercel CDN
+├── frontend/                 # ← Deployed to Vercel Free (static CDN)
 │   ├── index.html
 │   ├── css/
-│   │   ├── variables.css     # Design tokens (colors, spacing, typography)
-│   │   ├── layout.css        # Page structure & responsive grid
-│   │   └── components.css    # UI components (chat bubbles, cards, buttons)
+│   │   ├── variables.css
+│   │   ├── layout.css
+│   │   └── components.css
 │   └── js/
-│       ├── api.js            # Fetch calls to /api/v1/consult
-│       ├── app.js            # Application bootstrap & event wiring
-│       ├── state.js          # Lightweight state management
-│       └── ui.js             # DOM rendering (chat messages, stage visualizer)
+│       ├── config.js         # ← SET YOUR RENDER URL HERE before Vercel deploy
+│       ├── api.js            # Reads config.js, calls Render backend
+│       ├── app.js
+│       ├── state.js
+│       └── ui.js
 │
 ├── routers/
-│   └── api.py                # FastAPI Router — POST /api/v1/consult, GET /api/v1/config
+│   └── api.py                # POST /api/v1/consult, GET /api/v1/config
 │
-├── services/
+├── services/                 # ← Deployed to Render Free (backend)
 │   ├── orchestrator.py       # 3-stage pipeline coordinator
-│   ├── council_service.py    # Stage 1: parallel opinion generation
-│   ├── review_service.py     # Stage 2: anonymous peer review
-│   ├── chairman_service.py   # Stage 3: synthesis & verdict
-│   ├── provider_manager.py   # Routes requests to OpenRouter or Groq
-│   ├── openrouter_client.py  # Async OpenRouter API client (retry + backoff)
-│   └── groq_client.py        # Async Groq API client (retry + backoff)
+│   ├── council_service.py
+│   ├── review_service.py
+│   ├── chairman_service.py
+│   ├── provider_manager.py   # Lazy-loaded client routing
+│   ├── openrouter_client.py
+│   └── groq_client.py
 │
 ├── models/
-│   └── schemas.py            # Pydantic request/response models
+│   └── schemas.py            # Pydantic models
 │
-├── utils/
-│   └── (anonymization & security helpers)
-│
-├── main.py                   # FastAPI app factory, middleware, static file mount
+├── main.py                   # FastAPI app factory + CORS + middleware
 ├── requirements.txt          # Python dependencies
-├── vercel.json               # Vercel build + routing configuration
-├── runtime.txt               # Python version declaration (python-3.12)
-├── Procfile                  # Render/Railway deployment command
-├── .env.example              # Environment variable template (safe to commit)
-└── .gitignore                # Excludes .env, __pycache__, venv, etc.
+├── Procfile                  # Render start command
+├── runtime.txt               # python-3.12
+├── vercel.json               # Vercel static frontend config
+├── .env.example              # Env var template (safe to commit)
+└── .gitignore
 ```
 
 ---
 
 ## ⚡ The 3-Stage Pipeline
 
-```
-User Query
-    │
-    ▼
-┌─────────────────────────────────────────────────────────────┐
-│  STAGE 1 — Independent Opinions                             │
-│  4 LLM models (OpenRouter free-tier) respond in parallel   │
-│  Each model sees only the original prompt, not each other  │
-└─────────────────────────────────────────────────────────────┘
-    │
-    ▼
-┌─────────────────────────────────────────────────────────────┐
-│  STAGE 2 — Anonymous Peer Review                            │
-│  Council members cross-review each other's responses       │
-│  Responses are anonymized (Response #1, #2...) to reduce   │
-│  model-identity bias in scoring                             │
-└─────────────────────────────────────────────────────────────┘
-    │
-    ▼
-┌─────────────────────────────────────────────────────────────┐
-│  STAGE 3 — Chairman Synthesis                               │
-│  A designated "Chairman" model reads all opinions +        │
-│  reviews, resolves contradictions, and synthesizes a       │
-│  final consensus verdict                                    │
-└─────────────────────────────────────────────────────────────┘
-    │
-    ▼
-Structured JSON Response (DeliberationTrace)
-```
+| Stage | Activity | Description |
+|:---|:---|:---|
+| **Stage 1** | **Opinions** | 4 LLM models respond independently in parallel |
+| **Stage 2** | **Peer Review** | Council members anonymously score each other's reasoning |
+| **Stage 3** | **Synthesis** | Chairman model reads all opinions + scores → final verdict |
 
 ---
 
-## 🚀 Installation & Local Development
+## 🚀 Local Development
 
 ### Prerequisites
-
 - Python 3.12+
-- API keys for [OpenRouter](https://openrouter.ai/keys) (free) and optionally [Groq](https://console.groq.com/keys) (free)
-
-### Step 1 — Clone the Repository
+- Free API keys from [OpenRouter](https://openrouter.ai/keys) and [Groq](https://console.groq.com/keys)
 
 ```bash
+# 1. Clone
 git clone https://github.com/Adi230920/LLM-Council-Project-version-1.git
 cd LLM-Council-Project-version-1
-```
 
-### Step 2 — Create a Virtual Environment
-
-```bash
-# Create
+# 2. Virtual environment
 python -m venv venv
+venv\Scripts\activate       # Windows
+# source venv/bin/activate  # macOS/Linux
 
-# Activate (Windows)
-venv\Scripts\activate
-
-# Activate (macOS / Linux)
-source venv/bin/activate
-```
-
-### Step 3 — Install Dependencies
-
-```bash
+# 3. Dependencies
 pip install -r requirements.txt
-```
 
-### Step 4 — Configure Environment Variables
+# 4. Environment variables
+copy .env.example .env      # Windows
+# cp .env.example .env      # macOS/Linux
+# → Edit .env with your real API keys. Set ENVIRONMENT=development
 
-```bash
-# Copy the example file
-cp .env.example .env   # macOS/Linux
-copy .env.example .env  # Windows
-```
-
-Then open `.env` and fill in your real API keys:
-
-```toml
-OPENROUTER_API_KEY=sk-or-v1-your-real-key-here
-GROQ_API_KEY=gsk_your-real-key-here
-ENVIRONMENT=development
-ALLOWED_ORIGINS=http://localhost:8000
-```
-
-### Step 5 — Start the Server
-
-```bash
+# 5. Run
 uvicorn main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-Open **[http://localhost:8000](http://localhost:8000)** in your browser to consult the council.
+Open **http://localhost:8000** — FastAPI serves both the backend API and the static frontend from one process.
 
-> **Tip:** With `ENVIRONMENT=development`, the FastAPI docs are available at [http://localhost:8000/docs](http://localhost:8000/docs).
+> **Note:** `frontend/js/config.js` has `window.BOULE_BACKEND_URL = ""` by default, which makes `api.js` use relative paths (correct for local dev). Don't change this until you deploy to Render.
 
 ---
 
 ## 🔐 Environment Variables
 
+Set these in **Render Dashboard → Environment** (not Vercel — Vercel only hosts static files):
+
 | Variable | Required | Description |
 |---|---|---|
-| `OPENROUTER_API_KEY` | ✅ Yes | OpenRouter API key — get one free at [openrouter.ai/keys](https://openrouter.ai/keys) |
-| `GROQ_API_KEY` | ✅ Yes | Groq API key — get one free at [console.groq.com/keys](https://console.groq.com/keys) |
-| `ENVIRONMENT` | ✅ Yes | `development` (enables `/docs`) or `production` (disables docs) |
-| `ALLOWED_ORIGINS` | ✅ Yes | Comma-separated list of allowed CORS origins (e.g. `https://myapp.vercel.app`) |
+| `OPENROUTER_API_KEY` | ✅ | [openrouter.ai/keys](https://openrouter.ai/keys) — free account |
+| `GROQ_API_KEY` | ✅ | [console.groq.com/keys](https://console.groq.com/keys) — free account |
+| `ENVIRONMENT` | ✅ | Always `production` on Render |
+| `ALLOWED_ORIGINS` | ✅ | Your Vercel frontend URL, e.g. `https://bouleai.vercel.app` |
 
 ---
 
-## 🏗️ Build Instructions
-
-**This project has no build step.** The frontend is pure HTML/CSS/JS served directly as static files.
-
-```bash
-# Verify all dependencies install cleanly
-pip install -r requirements.txt
-
-# Verify the application imports correctly
-python -c "from main import app; print('✅ App import OK')"
-
-# Run in production mode (single worker for serverless)
-uvicorn main:app --host 0.0.0.0 --port 8000 --workers 1
-```
-
----
-
-## ☁️ Production Deployment
-
-### Deploying to Vercel (Full-Stack Serverless)
+## ☁️ Production Deployment (100% Free)
 
 See [DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md) for the complete step-by-step walkthrough.
 
-**Quick summary:**
-
-1. Push this repo to GitHub
-2. Go to [vercel.com/new](https://vercel.com/new) and import the repo
-3. Add your 4 environment variables in Vercel Dashboard → Settings → Environment Variables
-4. Click **Deploy**
-
-The `vercel.json` file in this repo handles all build + routing configuration automatically.
-
-> ⚠️ **Timeout Note:** The 3-stage LLM pipeline can take 30–90 seconds. Vercel's `maxDuration: 60` setting (used in this project's `vercel.json`) requires the **Pro plan**. On the free Hobby plan, requests will time out after 10 seconds. Consider using [Render](https://render.com/) for the backend if you're on a free tier.
-
-### Deploying to Render (Long-Running Process)
-
-Render supports the `Procfile` already included in this repo:
-
-```
-web: uvicorn main:app --host 0.0.0.0 --port $PORT --workers 1
-```
-
-1. Connect the repo in your Render dashboard
-2. Set the environment variables
-3. Deploy
+**Two-step summary:**
+1. **Deploy backend → Render Free** (no timeout, long-running FastAPI process)
+2. **Deploy frontend → Vercel Free** (instant CDN, global edge)
 
 ---
 
-## 🛡️ Security & Rate Limiting
+## 🛡️ Security
 
-| Feature | Implementation |
+| Feature | Details |
 |---|---|
-| **Rate Limiting** | 5 requests/min per IP on `/api/v1/consult` via `slowapi` |
-| **Global Limit** | 20 requests/min per IP across all routes |
-| **Security Headers** | X-Content-Type-Options, X-Frame-Options DENY, CSP |
-| **CORS** | Restricted to origins listed in `ALLOWED_ORIGINS` |
-| **Prompt Cap** | 800 characters max per request (prevents abuse) |
-| **Token Cap** | 512 tokens max per model response |
+| Rate Limiting | 5 req/min/IP on `/consult`, 20/min global |
+| Security Headers | Nosniff, Frame-Options DENY, Referrer-Policy |
+| CORS | Restricted to `ALLOWED_ORIGINS` env var |
+| Prompt Cap | 800 chars max |
+| Token Cap | 512 tokens max per model |
 
 ---
 
 ## 🔧 Troubleshooting
 
-### `EnvironmentError: OPENROUTER_API_KEY is not set`
-Ensure your `.env` file exists in the project root (same directory as `main.py`) and is fully populated. Run `cat .env` to confirm. On Vercel, check your Environment Variables in the dashboard.
+**`[Error: OPENROUTER_API_KEY is not configured]` in the response**
+→ API keys not set on Render. Go to Render Dashboard → Your Service → Environment → add the keys.
 
-### `502 Bad Gateway` on the `/api/v1/consult` endpoint
-The council deliberation timed out. This usually means either (a) the free-tier LLM models are under heavy load, or (b) you're on Vercel Hobby plan with a 10s timeout. Retry after a minute, or upgrade to Vercel Pro.
+**"Consult the Council" button does nothing / network error in browser console**
+→ `BOULE_BACKEND_URL` in `frontend/js/config.js` is empty or wrong. Update it with your Render URL and redeploy to Vercel.
 
-### The `/docs` page returns 404
-`/docs` is only enabled when `ENVIRONMENT=development`. Set this in your `.env` for local development.
+**CORS error in browser console**
+→ `ALLOWED_ORIGINS` on Render does not match your Vercel URL. Update it in Render Environment and redeploy.
 
-### `Cannot connect to localhost:8000` after starting the server
-Ensure the virtual environment is activated (`venv\Scripts\activate` on Windows) and that you've installed requirements (`pip install -r requirements.txt`).
+**Council takes 40–90 seconds to respond**
+→ Normal. The 3-stage pipeline calls 4+ LLM APIs. If the first request after a long idle takes longer, that's Render's free-tier cold start (~50 s). Subsequent requests are fast.
+
+**`uvicorn: command not found` on Render build**
+→ Render must be running from the repo root. Check that `requirements.txt` is in the root directory.
 
 ---
 
 ## 🗺️ Future Improvements
 
-- [ ] **Streaming responses** — stream Stage 1 opinions to the frontend as they arrive instead of waiting for all 4
-- [ ] **Persistent history** — save deliberation traces to a database (PostgreSQL via SQLAlchemy)
-- [ ] **Model selection UI** — let users pick which council models to use
-- [ ] **Custom Chairman** — allow users to designate a more powerful model (e.g. GPT-4o) as Chairman
-- [ ] **Export trace** — download the full deliberation trace as a PDF or JSON file
-- [ ] **Authentication** — user accounts to track and revisit past councils
-- [ ] **Redis rate limiting** — replace in-memory rate limiter for multi-instance deployments
-
----
-
-## 📄 License
-
-This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
+- [ ] Streaming Stage 1 opinions to frontend as they arrive
+- [ ] Persistent deliberation history (PostgreSQL)
+- [ ] Model selection UI (let users pick council members)
+- [ ] Export full trace as JSON / PDF
+- [ ] User authentication
 
 ---
 
 <div align="center">
-Built with ⚡ FastAPI, 🧠 OpenRouter + Groq, and a commitment to epistemic rigor.
+Built with ⚡ FastAPI · 🧠 OpenRouter + Groq · ☁️ Render + Vercel (100% Free)
 </div>

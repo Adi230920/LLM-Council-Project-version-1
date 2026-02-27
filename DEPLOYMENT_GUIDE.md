@@ -1,219 +1,302 @@
-# 🚀 BouleAI — Step-by-Step Vercel Deployment Guide
+# 🚀 BouleAI — Free Deployment Guide
+## Backend on Render · Frontend on Vercel · Zero Cost
 
-> **Who is this guide for?** First-time deployers. No prior Vercel experience needed.
-> Read every step carefully — this guide is written specifically for the **BouleAI** project structure.
-
----
-
-## What You're Deploying
-
-You are deploying a **full-stack Python web application**:
-
-| Layer | Technology | Where it Runs on Vercel |
-|---|---|---|
-| **Backend** | FastAPI (Python 3.12) | Vercel Serverless Function (`api/index.py`) |
-| **Frontend** | Vanilla HTML/CSS/JS | Vercel CDN Edge (served from `frontend/`) |
-| **API Route** | `POST /api/v1/consult` | Python Function |
-| **Home Page** | `frontend/index.html` | CDN (instant load, no Python needed) |
+> **Who is this for?** First-time deployers. No Render or Vercel experience needed.
+> Plain English, no skipping steps.
 
 ---
 
-## ⚠️ Before You Start — Read This
-
-> **The 3-stage LLM pipeline can take 30–90 seconds** because it calls 4+ LLM models, runs peer reviews, and runs synthesis. Vercel has two timeout limits:
->
-> - **Hobby (Free) Plan:** 10 seconds → **deliberation will time out** on free plan
-> - **Pro Plan:** Up to 60 seconds → covered by this project's `vercel.json`
->
-> **Recommendation:** Use **Vercel Pro** for this project, OR deploy the backend on [Render](https://render.com) (free tier, no timeout) and only host the frontend on Vercel.
-
----
-
-## Step 1 — Make Sure Your Code Is Pushed to GitHub
-
-Open your terminal (PowerShell on Windows) and run:
-
-```powershell
-cd "d:\Personal Work\Personal Projects\LLM Council - BouleAI - version 1"
-git status
-```
-
-You should see a clean working tree after the recent deployment prep commit. If not, run:
-
-```powershell
-git add .
-git commit -m "feat: prepare for Vercel serverless deployment"
-git push origin main
-```
-
-✅ **Success looks like:** `git push` completes without errors. Your repo at `github.com/Adi230920/LLM-Council-Project-version-1` shows the updated files.
-
----
-
-## Step 2 — Create Your Vercel Account
-
-1. Go to **[vercel.com](https://vercel.com)**
-2. Click **"Sign Up"**
-3. Choose **"Continue with GitHub"** — this links your GitHub account so Vercel can see your repos
-4. Complete the signup flow
-
-> If you already have a Vercel account linked to GitHub, skip this step.
-
----
-
-## Step 3 — Import Your Repository
-
-1. From your Vercel dashboard, click the **"Add New..."** button → **"Project"**
-2. You will see a list of your GitHub repositories
-3. Find **`LLM-Council-Project-version-1`** and click **"Import"**
-
----
-
-## Step 4 — Configure the Project (Very Important)
-
-On the "Configure Project" screen, you will see several settings. Here's exactly what to do:
-
-### Framework Preset
-- Vercel may ask what framework you're using
-- Select **"Other"** (not Next.js, not Create React App — this is a Python backend)
-- The `vercel.json` in your repo handles all configuration automatically
-
-### Build and Output Settings
-- **Build Command:** Leave blank (Python has no build step)
-- **Output Directory:** Leave blank (`vercel.json` handles this)
-- **Install Command:** Leave blank
-
-### Root Directory
-- Leave as **`./`** (the project root)
-
-> 🔑 The most important thing here is **Environment Variables** — see Step 5.
-
----
-
-## Step 5 — Add Your Environment Variables
-
-This is the most critical step. Without these, the app will crash immediately.
-
-1. On the Configure Project screen, scroll down to **"Environment Variables"**
-2. Add each variable one by one:
-
-| Name | Value | Notes |
-|---|---|---|
-| `OPENROUTER_API_KEY` | `sk-or-v1-your-real-key` | Get from [openrouter.ai/keys](https://openrouter.ai/keys) |
-| `GROQ_API_KEY` | `gsk_your-real-key` | Get from [console.groq.com/keys](https://console.groq.com/keys) |
-| `ENVIRONMENT` | `production` | Disables API docs for security |
-| `ALLOWED_ORIGINS` | `https://YOUR-PROJECT.vercel.app` | Add your actual Vercel URL after first deploy |
-
-> **Where is my Vercel URL?** After the first deploy, Vercel assigns a URL like `llm-council-project-version-1.vercel.app`. Come back to Settings → Environment Variables and update `ALLOWED_ORIGINS` with this URL, then redeploy.
-
----
-
-## Step 6 — Click Deploy
-
-1. Click the **"Deploy"** button
-2. You will see a build log appear — watch it carefully
-
-### What You Will See in the Build Log
+## Architecture Overview
 
 ```
-[Build] Installing Python dependencies from requirements.txt...
-[Build] Collecting fastapi>=0.111.0
-[Build] Collecting uvicorn[standard]>=0.29.0
-[Build] Collecting aiohttp>=3.9.0
-[Build] Collecting slowapi>=0.1.9
-[Build] Successfully installed all packages.
-[Build] Build completed.
+Your Browser
+   │
+   ├── Loads the page from → VERCEL FREE (static CDN, instant)
+   │                         frontend/index.html + CSS + JS
+   │
+   └── API calls go to    → RENDER FREE (web service, no timeout)
+                            FastAPI, uvicorn, 3-stage LLM pipeline
 ```
 
-✅ **Success looks like:** A green checkmark and "Deployment Successful" with a live URL.
-
-🔴 **If you see a build error**, see the Troubleshooting section below.
-
----
-
-## Step 7 — Test Your Deployment
-
-1. Click the URL shown in the Vercel dashboard (e.g., `https://llm-council-project-version-1.vercel.app`)
-2. You should see the **BouleAI chat interface** — the dark-themed chat screen
-3. Type a short question in the input box (e.g., "What is the best approach to building a startup?")
-4. Click **"Consult the Council"** and wait
-5. After 30–90 seconds, you should see the 3-stage deliberation results appear
-
-✅ **What success looks like:**
-- Stage 1: Four opinion cards from different models
-- Stage 2: Peer review scores appear
-- Stage 3: A synthesized "Chairman's Verdict" appears at the bottom
+**Why two platforms?**
+Vercel Free has a 10-second function timeout. The BouleAI 3-stage pipeline takes 30–90 seconds. Render Free runs a persistent process with **no timeout at all**. Vercel Free serves the static HTML/CSS/JS from a global CDN with zero cost. Together they give you a 100% free, production-grade deployment.
 
 ---
 
-## Step 8 — Update ALLOWED_ORIGINS
+## What You'll Need Before Starting
 
-After your first successful deploy:
+- [ ] A GitHub account (you already have one — your code is there)
+- [ ] A [Render](https://render.com) account (free, sign up with GitHub)
+- [ ] A [Vercel](https://vercel.com) account (free, sign up with GitHub)
+- [ ] Your `OPENROUTER_API_KEY` from [openrouter.ai/keys](https://openrouter.ai/keys)
+- [ ] Your `GROQ_API_KEY` from [console.groq.com/keys](https://console.groq.com/keys)
 
-1. Copy your Vercel URL (e.g., `https://llm-council-project-version-1.vercel.app`)
-2. Go to Vercel Dashboard → Your Project → **Settings** → **Environment Variables**
-3. Edit `ALLOWED_ORIGINS` and replace the placeholder with your real URL:
+Grab both API keys now (both are free) before starting.
+
+---
+
+## STEP 1 — Deploy the Backend to Render
+
+### 1a. Create your Render account
+
+1. Go to **[render.com](https://render.com)** and click **"Get Started for Free"**
+2. Choose **"Continue with GitHub"** — this lets Render see your repos
+3. Complete the signup
+
+### 1b. Create a new Web Service
+
+1. From your Render Dashboard, click **"New +"** → **"Web Service"**
+2. Click **"Connect a repository"**
+3. Find **`LLM-Council-Project-version-1`** and click **"Connect"**
+
+### 1c. Configure the Web Service
+
+On the configuration screen, fill in exactly these values:
+
+| Setting | Value |
+|---|---|
+| **Name** | `bouleai` (or any name you like) |
+| **Region** | Choose the one closest to you |
+| **Branch** | `main` |
+| **Runtime** | `Python 3` |
+| **Build Command** | `pip install -r requirements.txt` |
+| **Start Command** | `uvicorn main:app --host 0.0.0.0 --port $PORT --workers 1` |
+
+> **Important:** The Start Command must be exactly as shown above. The `$PORT` variable is provided by Render automatically.
+
+### 1d. Choose the Free plan
+
+- Scroll down to **"Instance Type"**
+- Select **"Free"**
+- Click **"Create Web Service"**
+
+### 1e. Set Environment Variables
+
+Before your first deploy, add your secrets:
+
+1. In your new Render service, go to **"Environment"** tab (in the left sidebar)
+2. Click **"Add Environment Variable"** and add each one:
+
+| Key | Value |
+|---|---|
+| `OPENROUTER_API_KEY` | Your real OpenRouter key (starts with `sk-or-v1-`) |
+| `GROQ_API_KEY` | Your real Groq key (starts with `gsk_`) |
+| `ENVIRONMENT` | `production` |
+| `ALLOWED_ORIGINS` | `*` ← temporary value, we'll fix this after Vercel deploy |
+
+> **Why `*` for ALLOWED_ORIGINS?** We don't know your Vercel URL yet. We'll update this after Step 3.
+
+3. Click **"Save Changes"**
+
+### 1f. Wait for first deploy
+
+- Render will start building automatically
+- Click the **"Logs"** tab to watch progress
+- The build takes 2–4 minutes on first run
+
+**What success looks like in the logs:**
+```
+==> pip install -r requirements.txt
+Successfully installed fastapi uvicorn aiohttp ...
+==> Starting service with 'uvicorn main:app ...'
+INFO:     Started server process
+INFO:     Waiting for application startup.
+🚀 BouleAI starting up…
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:10000
+```
+
+✅ You should see **"Your service is live"** at the top of the page.
+
+---
+
+## STEP 2 — Copy Your Render Backend URL
+
+1. Go to the top of your Render service page
+2. You'll see a URL like:
+   ```
+   https://bouleai.onrender.com
+   ```
+3. **Copy this URL exactly** — you'll need it in the next step
+
+---
+
+## STEP 3 — Update the Frontend with Your Render URL
+
+This is the step that connects your Vercel frontend to your Render backend.
+
+1. Open this file in your code editor:
+   ```
+   frontend/js/config.js
+   ```
+
+2. You'll see this line:
+   ```javascript
+   window.BOULE_BACKEND_URL = "";
+   ```
+
+3. Replace it with your Render URL (no trailing slash):
+   ```javascript
+   window.BOULE_BACKEND_URL = "https://bouleai.onrender.com";
+   ```
+
+4. Save the file, then commit and push:
+   ```powershell
+   git add frontend/js/config.js
+   git commit -m "config: set Render backend URL for production"
+   git push origin main
+   ```
+
+---
+
+## STEP 4 — Deploy the Frontend to Vercel
+
+### 4a. Create your Vercel account
+
+1. Go to **[vercel.com](https://vercel.com)** and click **"Sign Up"**
+2. Choose **"Continue with GitHub"**
+3. Complete the signup
+
+### 4b. Import your repository
+
+1. From your Vercel Dashboard, click **"Add New..."** → **"Project"**
+2. Find **`LLM-Council-Project-version-1`** and click **"Import"**
+
+### 4c. Configure the project
+
+On the configuration screen:
+
+| Setting | Value |
+|---|---|
+| **Framework Preset** | **Other** (not Next.js, not React — this is static HTML) |
+| **Root Directory** | Leave as `./` |
+| **Build Command** | Leave blank (no build step needed) |
+| **Output Directory** | `frontend` |
+| **Install Command** | Leave blank |
+
+> **Important:** Set **Output Directory** to `frontend` — this tells Vercel to serve files from the `frontend/` folder. The `vercel.json` in the repo also handles this automatically.
+
+### 4d. No environment variables needed on Vercel
+
+Vercel only hosts the static HTML/JS files. All secrets (API keys) live on Render. You don't need to add anything here.
+
+### 4e. Click Deploy
+
+- Click **"Deploy"**
+- Vercel deploys in about 30 seconds (no build step!)
+- You'll get a URL like `https://llm-council-project-version-1.vercel.app`
+
+---
+
+## STEP 5 — Lock Down CORS (Security)
+
+Now that you have your Vercel URL, update `ALLOWED_ORIGINS` on Render:
+
+1. Go back to **Render Dashboard** → your `bouleai` service → **"Environment"**
+2. Edit `ALLOWED_ORIGINS` — replace `*` with your real Vercel URL:
    ```
    https://llm-council-project-version-1.vercel.app
    ```
-4. Click Save, then go to **Deployments** → Click **"Redeploy"** on the latest deployment
+3. Click **"Save Changes"**
+4. Render will automatically redeploy (takes ~2 minutes)
 
 ---
 
-## 🔴 Troubleshooting Build Failures
+## STEP 6 — Test the Full System
 
-### Error: `ModuleNotFoundError: No module named 'fastapi'`
-**Cause:** Vercel couldn't install your requirements.  
-**Fix:** Check that `requirements.txt` is in the root directory (same level as `vercel.json`). Commit and push if missing.
+1. Open your Vercel URL in a browser (e.g. `https://llm-council-project-version-1.vercel.app`)
+2. You should see the **BouleAI chat interface** — dark theme, welcome modal
+3. Click **"Start Exploring"** to dismiss the modal
+4. Type a question in the input box:
+   ```
+   What is the best approach to building a successful startup?
+   ```
+5. Click the send button and **wait 30–90 seconds**
 
-### Error: `Error: No serverless functions were found`
-**Cause:** Vercel cannot find any Python function file.  
-**Fix:** Ensure `api/index.py` exists in your repo. Run `git ls-files api/` to confirm it is tracked by git.
+**What success looks like:**
+- A loading animation appears while the council deliberates
+- Stage 1 opinion cards appear (4 different model responses)
+- Stage 2 peer review scores load
+- A final Chairman's Verdict appears at the bottom
 
-### Error: `FUNCTION_INVOCATION_TIMEOUT`
-**Cause:** The LLM deliberation took longer than your plan's timeout.  
-**Fix:** Option A — Upgrade to Vercel Pro (60s timeout). Option B — Deploy backend on Render.com (no timeout) and update `ALLOWED_ORIGINS` to your Render URL.
-
-### The page loads but "Consult the Council" returns an error
-**Cause:** API keys are not set or incorrect.  
-**Fix:** Go to Vercel → Settings → Environment Variables. Verify `OPENROUTER_API_KEY` and `GROQ_API_KEY` are correct. Redeploy after saving.
-
-### CORS error in browser console
-**Cause:** `ALLOWED_ORIGINS` does not match your Vercel deployment URL.  
-**Fix:** Update `ALLOWED_ORIGINS` in Vercel env vars to exactly match your deployment URL (no trailing slash).
+✅ **Deployment complete!**
 
 ---
 
-## 🔁 How to Redeploy After Code Changes
+## ⚠️ Render Free Tier — Cold Start Warning
 
-Every time you push to your `main` branch on GitHub, Vercel **automatically redeploys**. You don't need to do anything manually.
+Render Free web services **spin down after 15 minutes of inactivity**. The first request after idle takes **~50 extra seconds** to wake the service back up. This is normal and expected.
 
-```powershell
-# Make your changes, then:
-git add .
-git commit -m "your change description"
-git push origin main
-# Vercel picks it up automatically within ~30 seconds
+**How to tell it's a cold start vs. an error:** The browser will wait silently for ~50s and then the full deliberation result appears. If you get a CORS error or a network error immediately, that's a different problem (see Troubleshooting below).
+
+**To keep the service warm** (optional): Use a free uptime monitor like [UptimeRobot](https://uptimerobot.com) to ping your Render URL every 14 minutes. This prevents cold starts entirely on the free tier.
+
+---
+
+## 🔴 Troubleshooting
+
+### "Network Error" or no response at all
+
+**Cause A:** `BOULE_BACKEND_URL` in `config.js` is wrong or empty.
+**Fix:** Open `frontend/js/config.js`, verify the URL matches your Render service URL exactly. Commit, push, wait for Vercel to redeploy (~30s).
+
+**Cause B:** Your Render service is still starting up (cold start). Wait 60 seconds and try again.
+
+### CORS error in browser DevTools (F12 → Console tab)
+
+```
+Access to fetch at 'https://bouleai.onrender.com/api/v1/consult' 
+from origin 'https://your-project.vercel.app' has been blocked by CORS policy
 ```
 
+**Fix:** `ALLOWED_ORIGINS` on Render doesn't match your Vercel URL.
+1. Go to Render → Environment → `ALLOWED_ORIGINS`
+2. Set it to exactly `https://your-project.vercel.app` (no trailing slash)
+3. Save and wait for redeploy
+
+### Render build fails with `ModuleNotFoundError`
+
+**Fix:** Check that your `requirements.txt` is in the root of the repo (same level as `main.py`). Run `git ls-files requirements.txt` to confirm it's tracked.
+
+### Vercel shows a blank page or 404
+
+**Fix:** Make sure **Output Directory** is set to `frontend` in Vercel Project Settings → Build & Output Settings. The `vercel.json` in the repo also sets `"outputDirectory": "frontend"`.
+
+### "OPENROUTER_API_KEY is not configured" appears in the chat response
+
+**Fix:** The API key is missing or incorrect on Render. Go to Render → Environment, verify `OPENROUTER_API_KEY` starts with `sk-or-v1-` and is complete.
+
 ---
 
-## ✅ Deployment Readiness Checklist
+## ✅ Final Deployment Checklist
 
-Before considering your deployment complete, verify all of these:
-
-- [ ] `git push` completed without errors
-- [ ] Vercel build log shows "Build completed" with no errors
-- [ ] The deployed URL loads the BouleAI chat interface
-- [ ] Submitting a question returns a deliberation result (not an error)
-- [ ] `ALLOWED_ORIGINS` has been updated with your real Vercel URL
-- [ ] No API keys are visible in any public GitHub files (check `git log` to be sure)
+- [ ] Render service shows "Live" status
+- [ ] Render build logs show `Application startup complete`
+- [ ] `frontend/js/config.js` has the correct Render URL
+- [ ] Vercel deployment succeeded (green checkmark)
+- [ ] Vercel frontend URL loads the BouleAI chat interface
+- [ ] Sending a question returns a full 3-stage deliberation result
+- [ ] `ALLOWED_ORIGINS` on Render updated to the Vercel URL (not `*`)
+- [ ] No API keys appear in any public GitHub files
 
 ---
 
-## 📞 Need Help?
+## 🔁 Future Updates
 
-- **Vercel Docs:** [vercel.com/docs](https://vercel.com/docs)
-- **FastAPI / Vercel Python Runtime:** [vercel.com/docs/functions/runtimes/python](https://vercel.com/docs/functions/runtimes/python)
-- **OpenRouter API:** [openrouter.ai/docs](https://openrouter.ai/docs)
-- **Groq API:** [console.groq.com/docs](https://console.groq.com/docs)
+Whenever you push new code to GitHub:
+- **Render** auto-redeploys the backend (takes ~2–3 minutes)
+- **Vercel** auto-redeploys the frontend (takes ~30 seconds)
+
+You don't need to do anything manually after the first setup.
+
+---
+
+## 📞 Platform Links
+
+| Platform | Link |
+|---|---|
+| Render Dashboard | [dashboard.render.com](https://dashboard.render.com) |
+| Vercel Dashboard | [vercel.com/dashboard](https://vercel.com/dashboard) |
+| OpenRouter Keys | [openrouter.ai/keys](https://openrouter.ai/keys) |
+| Groq Keys | [console.groq.com/keys](https://console.groq.com/keys) |
+| UptimeRobot (optional) | [uptimerobot.com](https://uptimerobot.com) |
