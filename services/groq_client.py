@@ -38,7 +38,12 @@ class GroqClient:
     ) -> None:
         self._api_key: str = api_key or os.environ.get("GROQ_API_KEY", "")
         if not self._api_key:
-            raise EnvironmentError("GROQ_API_KEY is not set.")
+            # Soft-fail: log a warning instead of crashing the application.
+            # The ProviderManager will return a descriptive error string if
+            # a Groq-routed request is made without a key configured.
+            logger.warning(
+                "GROQ_API_KEY is not set. Groq provider will be unavailable."
+            )
 
         self._max_retries: int = max_retries
         self._backoff_base: float = backoff_base
