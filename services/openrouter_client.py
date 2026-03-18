@@ -252,7 +252,12 @@ class OpenRouterClient:
             data: dict[str, Any] = await response.json()
 
         try:
-            return data["choices"][0]["message"]["content"]
+            content = data["choices"][0]["message"]["content"]
+            if content is None:
+                raise ValueError(
+                    f"OpenRouter returned null content for model (possible safety filter or empty response): {data}"
+                )
+            return content
         except (KeyError, IndexError, TypeError) as exc:
             raise ValueError(
                 f"Unexpected OpenRouter response structure: {data}"

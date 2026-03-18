@@ -64,7 +64,7 @@ async def conduct_reviews(
     
     reviews = []
     for config, result in zip(reviewer_configs, raw_results):
-        if isinstance(result, Exception) or (isinstance(result, str) and result.startswith("[")):
+        if result is None or isinstance(result, Exception) or (isinstance(result, str) and result.startswith("[")):
             logger.error("Reviewer %s (%s) failed in Stage 2", config.model, config.provider)
             reviews.append(Stage2Review(
                 reviewer_model_id=config.model,

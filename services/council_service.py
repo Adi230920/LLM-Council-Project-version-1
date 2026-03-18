@@ -46,7 +46,7 @@ async def generate_opinions(
         succeeded = True
         response_text = result
         
-        if isinstance(result, Exception):
+        if result is None or isinstance(result, Exception):
             logger.error("Model %s (%s) failed in Stage 1: %s", config.model, config.provider, result)
             succeeded = False
             response_text = f"[{config.model} failed to generate an opinion]"
