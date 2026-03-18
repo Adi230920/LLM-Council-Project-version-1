@@ -55,7 +55,7 @@ async def conduct_reviews(
             config=config,
             messages=messages,
             temperature=temperature,
-            max_tokens=1024  # ✅ Reduced from 2048 — reviews are structured JSON, 1024 is sufficient
+            max_tokens=2048  # ✅ Raised to 2048: reasoning models need room to think AND write full JSON output
         )
         for config in reviewer_configs
     ]

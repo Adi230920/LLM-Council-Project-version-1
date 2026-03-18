@@ -252,13 +252,30 @@ class OpenRouterClient:
             data: dict[str, Any] = await response.json()
 
         try:
-            content = data["choices"][0]["message"]["content"]
+            choice = data["choices"][0]
+            content = choice["message"]["content"]
             if content is None:
+                finish_reason = choice.get("finish_reason", "unknown")
+                model_id = data.get("model", payload.get("model", "unknown"))
+                if finish_reason == "length":
+                    # Reasoning model exhausted its token budget in the internal
+                    # scratchpad — no content was produced. Raise a clean, terse
+                    # error (no data blob) so the retry handler logs one line.
+                    logger.warning(
+                        "⚠ [%s] hit token limit during reasoning (finish_reason=length) — content is null.",
+                        model_id,
+                    )
+                    raise ValueError(
+                        f"Token limit reached during reasoning phase for model {model_id} "
+                        "(content=null, finish_reason=length). "
+                        "Increase max_tokens or switch to a non-reasoning model."
+                    )
                 raise ValueError(
-                    f"OpenRouter returned null content for model (possible safety filter or empty response): {data}"
+                    f"OpenRouter returned null content for model {model_id} "
+                    f"(finish_reason={finish_reason}). Possible safety filter or empty response."
                 )
             return content
         except (KeyError, IndexError, TypeError) as exc:
             raise ValueError(
-                f"Unexpected OpenRouter response structure: {data}"
+                f"Unexpected OpenRouter response structure — missing expected keys."
             ) from exc

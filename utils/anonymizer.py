@@ -10,10 +10,12 @@ def anonymize_opinions(opinions: List[Stage1Opinion]) -> Tuple[str, Dict[int, st
     """
     formatted_parts = []
     mapping = {}
-    
-    for i, op in enumerate(opinions, start=1):
-        # We use the response_id assigned in Stage 1
+
+    for op in opinions:
+        if not op.succeeded:
+            # Skip failed opinions — reviewers should not score error fallback strings
+            continue
         formatted_parts.append(f"### Response #{op.response_id}\n{op.response}\n")
         mapping[op.response_id] = op.model_id
-        
+
     return "\n---\n".join(formatted_parts), mapping

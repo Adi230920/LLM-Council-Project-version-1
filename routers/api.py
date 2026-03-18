@@ -17,14 +17,12 @@ limiter = Limiter(key_func=get_remote_address)
 router = APIRouter(prefix="/api/v1", tags=["Council"])
 
 # ---------------------------------------------------------------------------
-# Dependency — shared ProviderManager per request (manages aiohttp sessions)
+# Dependency — retrieve the shared ProviderManager from app.state.
+# The manager (and its aiohttp connection pool) is created once at startup
+# in main.py's lifespan() and lives for the entire application lifetime.
 # ---------------------------------------------------------------------------
-async def get_manager() -> ProviderManager:
-    manager = ProviderManager()
-    try:
-        yield manager
-    finally:
-        await manager.close()
+async def get_manager(request: Request) -> ProviderManager:
+    return request.app.state.provider_manager
 
 # ---------------------------------------------------------------------------
 # POST /api/v1/consult — Full 3-stage deliberation

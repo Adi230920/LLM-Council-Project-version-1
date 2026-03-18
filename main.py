@@ -12,6 +12,8 @@ import os
 from dotenv import load_dotenv
 load_dotenv()
 
+from services.provider_manager import ProviderManager
+
 
 # ---------------------------------------------------------------------------
 # Logging
@@ -31,7 +33,12 @@ logger = logging.getLogger("boule_ai")
 async def lifespan(app: FastAPI):
     """Manage startup and shutdown tasks."""
     logger.info("🚀 BouleAI starting up…")
+    # ✅ Fix 4: Create one shared ProviderManager for the app's lifetime.
+    # This reuses the same aiohttp connection pool across all requests
+    # instead of creating/destroying a session on every API call.
+    app.state.provider_manager = ProviderManager()
     yield
+    await app.state.provider_manager.close()
     logger.info("🛑 BouleAI shutting down…")
 
 

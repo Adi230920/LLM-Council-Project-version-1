@@ -134,6 +134,14 @@ class GroqClient:
             response.raise_for_status()
             data = await response.json()
         try:
-            return data["choices"][0]["message"]["content"]
+            content = data["choices"][0]["message"]["content"]
+            if content is None:
+                model_id = data.get("model", payload.get("model", "unknown"))
+                finish_reason = data["choices"][0].get("finish_reason", "unknown")
+                raise ValueError(
+                    f"Groq returned null content for model {model_id} "
+                    f"(finish_reason={finish_reason}). Possible safety filter or empty response."
+                )
+            return content
         except (KeyError, IndexError, TypeError) as exc:
-            raise ValueError(f"Unexpected Groq response structure: {data}") from exc
+            raise ValueError("Unexpected Groq response structure — missing expected keys.") from exc

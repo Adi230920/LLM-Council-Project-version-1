@@ -45,4 +45,4 @@ class ConsultRequest(BaseModel):
     council_models: Optional[Annotated[List[ModelConfig], Field(max_length=4)]] = None
     chairman_model: Optional[ModelConfig] = None
     temperature: float = Field(0.7, ge=0.0, le=1.0)
-    max_tokens: int = Field(512, ge=64, le=512)  # Hard cap: 512 tokens per model
+    max_tokens: int = Field(512, ge=64, le=1024)  # Default 512; max 1024 to support reasoning models
