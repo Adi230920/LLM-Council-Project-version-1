@@ -15,9 +15,9 @@ logger = logging.getLogger("boule_ai.orchestrator")
 # members to always fail. Replaced with a real free model.
 # ---------------------------------------------------------------------------
 DEFAULT_COUNCIL_MODELS = [
-    ModelConfig(provider="openrouter", model="arcee-ai/trinity-large-preview:free"),
-    ModelConfig(provider="openrouter", model="z-ai/glm-4.5-air:free"),
-    ModelConfig(provider="openrouter", model="arcee-ai/trinity-mini:free"),
+    ModelConfig(provider="openrouter", model="openrouter/free"),
+    ModelConfig(provider="openrouter", model="openrouter/free"),
+    ModelConfig(provider="openrouter", model="openrouter/free"),
     ModelConfig(provider="openrouter", model="openrouter/free"),
 ]
 
