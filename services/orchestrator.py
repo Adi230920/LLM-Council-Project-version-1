@@ -15,13 +15,13 @@ logger = logging.getLogger("boule_ai.orchestrator")
 # members to always fail. Replaced with a real free model.
 # ---------------------------------------------------------------------------
 DEFAULT_COUNCIL_MODELS = [
-    ModelConfig(provider="openrouter", model="openrouter/free"),
-    ModelConfig(provider="openrouter", model="openrouter/free"),
-    ModelConfig(provider="openrouter", model="openrouter/free"),
-    ModelConfig(provider="openrouter", model="openrouter/free"),
+    ModelConfig(provider="groq", model="llama-3.1-8b-instant"),
+    ModelConfig(provider="groq", model="meta-llama/llama-4-scout-17b-16e-instruct"),
+    ModelConfig(provider="groq", model="llama-3.3-70b-versatile"),
+    ModelConfig(provider="groq", model="meta-llama/llama-prompt-guard-2-86m"),
 ]
 
-DEFAULT_CHAIRMAN_MODEL = ModelConfig(provider="openrouter", model="openrouter/free")
+DEFAULT_CHAIRMAN_MODEL = ModelConfig(provider="groq", model="openai/gpt-oss-120b")
 
 async def run_deliberation(
     request: ConsultRequest,
