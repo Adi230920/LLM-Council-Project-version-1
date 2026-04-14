@@ -18,7 +18,7 @@ DEFAULT_COUNCIL_MODELS = [
     ModelConfig(provider="groq", model="llama-3.1-8b-instant"),
     ModelConfig(provider="groq", model="meta-llama/llama-4-scout-17b-16e-instruct"),
     ModelConfig(provider="groq", model="llama-3.3-70b-versatile"),
-    ModelConfig(provider="groq", model="meta-llama/llama-prompt-guard-2-86m"),
+    ModelConfig(provider="groq", model="qwen/qwen3-32b"),
 ]
 
 DEFAULT_CHAIRMAN_MODEL = ModelConfig(provider="groq", model="openai/gpt-oss-120b")
