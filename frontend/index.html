@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,6 +12,7 @@
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.3/purify.min.js"></script>
 </head>
+
 <body>
 
   <!-- Onboarding Modal -->
@@ -18,7 +20,7 @@
     <div class="modal-content">
       <h2>Welcome to the AI Council</h2>
       <p>
-        Experience a rigorous, 3-stage deliberation process. Instead of a single AI, 
+        Experience a rigorous, 3-stage deliberation process. Instead of a single AI,
         your queries are evaluated by a whole council:
       </p>
       <ul>
@@ -29,14 +31,15 @@
       <p>Discover complete transparency via the Trace form under each answer.</p>
       <div class="modal-actions">
         <button id="startExploreBtn" class="btn primary">Start Exploring</button>
-        <a href="https://github.com/Adi230920/LLM-Council-Project" target="_blank" class="btn secondary">View on GitHub</a>
+        <a href="https://github.com/Adi230920/LLM-Council-Project-version-1" target="_blank" class="btn secondary">View
+          on GitHub</a>
       </div>
     </div>
   </div>
 
   <!-- Main App Layout -->
   <div class="app-container">
-    
+
     <!-- Top Header -->
     <header class="app-header">
       <div class="logo">
@@ -45,11 +48,14 @@
       <div class="header-actions">
         <button id="themeToggle" class="icon-btn" aria-label="Toggle Theme">
           <!-- Default Moon Icon for Dark mode -->
-          <svg id="themeIcon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+          <svg id="themeIcon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
           </svg>
         </button>
-        <a href="https://github.com/Adi230920/LLM-Council-Project" target="_blank" class="btn secondary sm-hide">GitHub</a>
+        <a href="https://github.com/Adi230920/LLM-Council-Project" target="_blank"
+          class="btn secondary sm-hide">GitHub</a>
       </div>
     </header>
 
@@ -66,10 +72,13 @@
     <!-- Sticky Input Area -->
     <footer class="chat-input-area">
       <div class="input-wrapper">
-        <textarea id="promptInput" rows="1" placeholder="Consult the Council..." aria-label="Consult the Council"></textarea>
+        <textarea id="promptInput" rows="1" placeholder="Consult the Council..."
+          aria-label="Consult the Council"></textarea>
         <button id="sendBtn" class="send-btn" aria-label="Send">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
           </svg>
         </button>
       </div>
@@ -77,11 +86,12 @@
         Powered by BouleAI high-fidelity 3-stage validation
       </div>
     </footer>
-    
+
   </div>
 
   <!-- Runtime config: set BOULE_BACKEND_URL to your Render backend URL -->
   <script src="js/config.js"></script>
   <script type="module" src="js/app.js"></script>
 </body>
+
 </html>
